@@ -2,4 +2,4 @@
 CVE-2022-40897
 
 #secrets
-AsymmetricPrivateKey
+AsymmetricPrivateKey-/etc/tls/key.pem
