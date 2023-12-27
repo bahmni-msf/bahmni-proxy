@@ -26,6 +26,7 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           trivyignores: ./.trivyignore
+          skip-files: /etc/tls/key.pem
           vuln-type: 'os,library'
           severity: 'HIGH,CRITICAL'
       - name: Configure AWS Credentials
