@@ -2,7 +2,7 @@ name: Build and Publish
 on:
   push:
     branches:
-      - [ocp-bahmni-lite]
+      - ocp-bahmni-lite
 
 jobs:
   docker-build-publish:
