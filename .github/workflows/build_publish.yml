@@ -41,6 +41,7 @@ jobs:
           REPOSITORY: bahmni-msf-lite/proxy
           IMAGE_TAG: ${{ env.ARTIFACT_VERSION }}
         run: |
+          echo $APP_VERSION
           docker tag proxy:latest $REGISTRY/$REPOSITORY:latest
           docker tag proxy:latest $REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
