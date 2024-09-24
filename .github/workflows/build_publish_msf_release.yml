@@ -1,10 +1,10 @@
 name: Build and Publish
 on:
   push:
-    tags:
-      - 'msf-release-[0-9]+.[0-9]+.[0-9]+'
+    branches:
+      - msf-ocp-release
   workflow_dispatch:
-  
+
 jobs:
   docker-build-publish:
     name: Docker Build & Publish
@@ -21,21 +21,21 @@ jobs:
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
-          trivyignores: ./.trivyignore
+          # trivyignores: ./.trivyignore
           skip-files: /etc/tls/key.pem
           vuln-type: 'os,library'
           severity: 'HIGH,CRITICAL'
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.BAHMNI_LITE_AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.BAHMNI_LITE_AWS_SECRET_KEY }}
-          aws-region: ${{ secrets.BAHMNI_LITE_AWS_REGION }}
+          aws-access-key-id: ${{ secrets.BAHMNI_LITE_AWS_UAT_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.BAHMNI_LITE_AWS_UAT_SECRET_KEY }}
+          aws-region: ${{ secrets.BAHMNI_LITE_AWS_UAT_REGION }}
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
       - name: Set Image tag varaible
-        run: echo "ARTIFACT_VERSION=$(cat package/.appversion)-$GITHUB_REF_NAME" >> $GITHUB_ENV
+        run: echo "ARTIFACT_VERSION=$(cat package/.appversion)-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
       - name: Tag and Push docker image to Amazon ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -43,5 +43,7 @@ jobs:
           IMAGE_TAG: ${{ env.ARTIFACT_VERSION }}
         run: |
           echo $APP_VERSION
+          docker tag proxy:latest $REGISTRY/$REPOSITORY:latest
           docker tag proxy:latest $REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $REGISTRY/$REPOSITORY:latest
