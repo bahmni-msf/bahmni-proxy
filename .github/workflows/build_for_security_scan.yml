@@ -1,0 +1,27 @@
+name: Build and Publish
+on:
+  push:
+    branches:
+      - MOBN-2469
+  workflow_dispatch:
+
+jobs:
+  docker-build-publish:
+    name: Docker Build & Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull Github code
+        uses: actions/checkout@v4
+      - name: Build docker image
+        run: docker build -t proxy:latest -f Dockerfile .
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'proxy:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+            trivyignores: ./.trivyignore
+          skip-files: /etc/tls/key.pem
+          vuln-type: 'os,library'
+          severity: 'HIGH,CRITICAL'
